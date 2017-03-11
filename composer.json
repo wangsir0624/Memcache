@@ -1,0 +1,28 @@
+{
+  "name": "wangjian/memcache",
+  "description": "PHP写的Memcached客户端API",
+  "license": "MIT",
+  "keywords": ["xml parser"],
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Wangjian",
+      "email": "1636801376@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.0"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "Wangjian\\Memcache\\": "src"
+    }
+  },
+
+  "autoload-dev": {
+    "psr-4": {
+      "Wangjian\\Memcache\\Test\\": "test"
+    }
+  }
+}
