@@ -23,21 +23,22 @@ class MyMemcache {
             throw new RuntimeException("the memcache client is alread connected");
         }
 
-        $stream = stream_socket_client("tcp://$ip:$port", $errno, $errstr, $timeout);
-
-        if(!$stream) {
-            throw new RuntimeException("create socket failed($errno): $errstr");
-        }
-
-        $connection = new Connection($stream);
-
         $this->balancer = new OneBalancer();
-        $this->balancer->addConnection($connection);
+        $this->balancer->addConnection(self::createConnection($ip, $port, $timeout));
         $this->status = self::CONNECTED;
     }
 
-    public function addServer() {
+    public function addServer($ip, $port, $weight = 1, $timeout = 5) {
+        if($this->balancer instanceof OneBalancer) {
+            throw new RuntimeException("the memcache client is alread connected");
+        }
 
+        if(!($this->balancer instanceof MoreBalancer)) {
+            $this->balancer = new MoreBalancer($this);
+            $this->status = self::CONNECTED;
+        }
+
+        $this->balancer->addConnectionConfig($ip, $port, $weight, $timeout);
     }
 
     public function close() {
@@ -208,5 +209,15 @@ class MyMemcache {
         }
 
         return $this->balancer->getVersion();
+    }
+
+    public static function createConnection($ip, $port, $timeout) {
+        $stream = stream_socket_client("tcp://$ip:$port", $errno, $errstr, $timeout);
+
+        if(!$stream) {
+            throw new RuntimeException("create socket failed($errno): $errstr");
+        }
+
+        return new Connection($stream);
     }
 }
